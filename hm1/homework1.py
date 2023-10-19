@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score
 
 X = pd.read_csv("../hm1/X.csv")
 y = pd.read_csv("../hm1/y.csv")
-#wstawić za random_state swój indeks
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state= 335723)
 
 def accuracy(n_splits,X, y, kryt: str):
