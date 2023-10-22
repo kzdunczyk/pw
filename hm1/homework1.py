@@ -7,12 +7,21 @@ from sklearn.model_selection import cross_val_score
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 
-#przygotowanie danych
-
 X = pd.read_csv("../pw/hm1/X.csv")
 y = pd.read_csv("../pw/hm1/y.csv")
 
 def accuracy(cv:int,X, y, wart = 0):
+    """Function calculates accuracy
+
+    Args:
+        cv (int): _description_
+        X (_type_): _description_
+        y (_type_): _description_
+        wart (int, optional): _description_. Defaults to 0.
+
+    Returns:
+        _type_: _description_
+    """
     if(cv <5):
         return "Podaj wartosc wieksza niz 5"
     else:
@@ -47,3 +56,42 @@ def accuracy(cv:int,X, y, wart = 0):
     
 wyniki  = accuracy(8,X,y, 10)
 print(wyniki)
+
+
+fig, ax = plt.subplots()
+
+# List of colors for the lines
+colors = ['r', 'g', 'b','b','b','b','b','b','b','b','b','b',
+          'y','y','y','y','y','y','y','y','y','y']
+
+
+for y, color in zip(wyniki, colors):
+    ax.axhline(y=y, color=color, linestyle='--')
+
+# Add labels and a legend (optional)
+ax.set_ylabel('Accuracy')
+ax.set_ylim(0.63, 0.84)
+ax.set_xticklabels([])
+# Display the plot
+plt.show()
+
+largest_value = max(wyniki)
+largest_index = wyniki.index(largest_value)
+print(largest_value, largest_index)
+
+
+X = pd.read_csv("C:/Users/Kajetan/Desktop/pw/hm1/X.csv")
+y = pd.read_csv("C:/Users/Kajetan/Desktop/pw/hm1/y.csv")
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state= 335723)
+Tree = tree.DecisionTreeClassifier(criterion = 'entropy',
+                                               random_state = 335723 ) 
+Tree = Tree.fit(X_train, y_train)
+y_pred_test = Tree.predict(X_test)
+print("accuracy:", accuracy_score(y_test, y_pred_test))
+print("recall:", recall_score(y_test, y_pred_test))
+print("precision:", precision_score(y_test, y_pred_test))
+
+roc_auc_score(y_test, Tree.predict_proba(X_test)[:, 1])
+RocCurveDisplay.from_estimator(Tree, X_test, y_test)
