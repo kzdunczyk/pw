@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 #przygotowanie danych
 
-X = pd.read_csv("C:/Users/Kajetan/Desktop/pw/hm1/X.csv")
-y = pd.read_csv("C:/Users/Kajetan/Desktop/pw/hm1/y.csv")
+X = pd.read_csv("../pw/hm1/X.csv")
+y = pd.read_csv("../pw/hm1/y.csv")
 
 def accuracy(cv:int,X, y, wart = 0):
     if(cv <5):
@@ -43,8 +43,7 @@ def accuracy(cv:int,X, y, wart = 0):
                "\n Dokładność na podstawie kryt. etropii to:", wyniki2, 
                "\n Dokładność na podstawie głebokości drzewa to:", wyniki3,
                "\n Dokładność na podstawie min liczby obserwacji w lisciu to:"
-               , wyniki4,
-              )
+               , wyniki4,)
     
-    wyniki  = accuracy(8,X,y, 10 )
+wyniki  = accuracy(8,X,y, 10)
 print(wyniki)
