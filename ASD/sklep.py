@@ -1,85 +1,93 @@
-from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QLabel, QGridLayout
-from PyQt5.QtWidgets import QLineEdit, QPushButton, QHBoxLayout
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 
-class Sklep(QWidget):
+class AnotherWindow(QWidget):
+    def __init__(self, data):
+        super().__init__()
+        self.data = data
+        self.wynik()
+
+    def wynik(self):
+        self.resize(300, 200)
+        self.setWindowTitle("Wynik")
+        label = QLabel("Przypisane zamówienia do pracowników:")
+        data_label = QLabel(str(self.data))
+        layout = QGridLayout(self)
+        layout.addWidget(label, 0, 0)
+        layout.addWidget(data_label, 1, 0)
+        self.show()
+
+class Sklep(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-
+        self.second_window = None
         self.interfejs()
 
     def interfejs(self):
+        widget = QWidget()
+        layout = QGridLayout()
 
-        # etykiety
-        etykieta1 = QLabel("Liczba klientów:", self)
-        etykieta2 = QLabel("Liczba pracowników:", self)
-        etykieta3 = QLabel("Czas obsługi zamówienia kielna i:", self)
-        etykieta4 = QLabel("Czas pracy każdego pracownika:", self)
-
-        # przypisanie widgetów do układu tabelarycznego
-        ukladT = QGridLayout()
-        ukladT.addWidget(etykieta1, 0, 0)
-        ukladT.addWidget(etykieta2, 0, 1)
-        ukladT.addWidget(etykieta3, 0, 3)
-        ukladT.addWidget(etykieta4, 0, 4)
-
-
-        # 1-liniowe pola edycyjne
+        layout.addWidget(QLabel('Liczba klientów:'), 0, 0)
         self.liczba1Edt = QLineEdit()
+        self.liczba1Edt.setPlaceholderText("Wprowadź liczbę całkowitą")
+        layout.addWidget(self.liczba1Edt, 0, 1)
+        layout.addWidget(QLabel('Liczba pracowników:'), 1, 0)
         self.liczba2Edt = QLineEdit()
+        self.liczba2Edt.setPlaceholderText("Wprowadź liczbę całkowitą")
+        layout.addWidget(self.liczba2Edt, 1, 1)
+        layout.addWidget(QLabel('Czas obsługi i-tego zamówienia:'), 2, 0)
         self.liczba3Edt = QLineEdit()
+        self.liczba3Edt.setPlaceholderText("Wprowadź dziąg licz całkowitych, w postaci: 1,2,3,4 itd.")
+        layout.addWidget(self.liczba3Edt, 2, 1)
+        layout.addWidget(QLabel('Czas pracy każdego pracownika:'), 3, 0)
         self.liczba4Edt = QLineEdit()
-        self.wynikEdt = QLineEdit()
+        self.liczba4Edt.setPlaceholderText("Wprowadź liczbę całkowitą")
+        layout.addWidget(self.liczba4Edt, 3, 1)
 
-        self.wynikEdt.readonly = True
-        self.wynikEdt.setToolTip('Wpisz <b>liczby</b> i wybierz działanie...')
-
-        ukladT.addWidget(self.liczba1Edt, 1, 0)
-        ukladT.addWidget(self.liczba2Edt, 1, 1)
-        ukladT.addWidget(self.liczba3Edt, 1, 2)
-        ukladT.addWidget(self.liczba4Edt, 1, 3)
-        ukladT.addWidget(self.wynikEdt, 1, 2)
-
-        # przyciski
-        obliczBtn = QPushButton("&Oblicz", self)
-        ukladH = QHBoxLayout()
-        ukladH.addWidget(obliczBtn)
-        ukladT.addLayout(ukladH, 2, 0, 1, 3)
-
-        # przypisanie utworzonego układu do okna
-        self.setLayout(ukladT)
-        obliczBtn.clicked.connect(self.przydziel_pracownikow)
-
-        self.resize(200, 400)
+        button = QPushButton('Oblicz')
+        layout.addWidget(button, 4, 1)
+        button.clicked.connect(self.check)
+        button.clicked.connect(self.open_new_window)
+        
+        self.resize(600, 400)
         self.setWindowTitle("Przydzielanie pracowników")
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
         self.show()
 
-    def przydziel_pracownikow(self):
+    def open_new_window(self):
+        n = int(self.liczba1Edt.text())
+        m = int(self.liczba2Edt.text())
+        tekst = self.liczba3Edt.text()
+        ti = [float(x) for x in tekst.split(',')]
+        T = int(self.liczba4Edt.text())
+                    
+        zamowienia = list(range(1, n + 1))
+        pracownicy = {i: [] for i in range(1, m + 1)}
 
-        nadawca = self.sender()    
+        zamowienia.sort(key=lambda i: ti, reverse=True)
+                    
+        for i in zamowienia:
+            for j in range(1, m + 1):
+                if sum(ti[z - 1] for z in pracownicy[j]) + ti[i - 1] <= T:
+                    pracownicy[j].append(i)
+                    break
+
+    
+        self.second_window = AnotherWindow(pracownicy)
+        self.second_window.show()
+        return pracownicy
+    
+    def check(self):
+        n = int(self.liczba1Edt.text())
+        m = int(self.liczba2Edt.text())
+        tekst = self.liczba3Edt.text()
+        ti = [float(x) for x in tekst.split(',')]
+        T = int(self.liczba4Edt.text())
+
         try:
             n = int(self.liczba1Edt.text())
-            m = int(self.liczba2Edt.text())
-            ti = int(self.liczba3Edt.text())
-            T = int(self.liczba4Edt.text())
-            zamowienia = list(range(1, n + 1))
-            pracownicy = {i: [] for i in range(1, m + 1)}
-
-            zamowienia.sort(key=lambda i: ti[i-1], reverse=True)
-            if nadawca.text() == "&Oblicz":
-                for i in zamowienia:
-                    for j in range(1, m + 1):
-                        if sum(ti[z - 1] for z in pracownicy[j]) + ti[i - 1] <= T:
-                            pracownicy[j].append(i)
-                            break
-
-            else:
-                pass
-            self.wynikEdt.setText(str(pracownicy))
-        except:
-            QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
+        except ValueError:
+            print("Tekst nie jest liczbą całkowitą")
 
 if __name__ == '__main__':
     import sys
@@ -87,7 +95,3 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     okno = Sklep()
     sys.exit(app.exec_())
-
-
-
-
