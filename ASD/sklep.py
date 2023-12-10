@@ -97,7 +97,7 @@ class Sklep(QMainWindow):
             elif len(ti)!= n:
                 QMessageBox.warning(self, "Błąd", "Błędne dane", QMessageBox.Ok)
             else:
-                self.button.clicked.connect(self.open_new_window)
+                self.open_new_window()
 
 if __name__ == '__main__':
     import sys
